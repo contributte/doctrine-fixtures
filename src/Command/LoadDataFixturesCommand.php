@@ -119,6 +119,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 			$this->loader->loadPaths($paths);
 		} else {
 			$this->loader->load();
+			$paths = $this->loader->getPaths();
 		}
 
 		$fixtures = $this->loader->getFixtures();

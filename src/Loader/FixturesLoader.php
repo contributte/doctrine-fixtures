@@ -61,4 +61,12 @@ class FixturesLoader extends Loader
 		parent::addFixture($fixture);
 	}
 
+	/**
+	 * @return string[]
+	 */
+	public function getPaths()
+	{
+		return $this->paths;
+	}
+
 }
