@@ -28,6 +28,11 @@
       "Nettrine\\Fixtures\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/cases/"
+    }
+  },
   "scripts": {
     "qa": [
       "linter src tests",
