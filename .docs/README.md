@@ -9,18 +9,28 @@
 
 ## Usage
 
-Use Symfony/Console integration [Contributte/Console](https://github.com/contributte/console).
-
-Register extension.
+At first you should register `FixturesExtension` at your config file.
 
 ```yaml
 extensions:
     fixtures: Nettrine\Fixtures\DI\FixturesExtension
 ```
 
+This extension is highly depending on `Symfony\Console`, it does not make sence to use it without `Console`. Take
+a look at simple [Contributte/Console](https://github.com/contributte/console) integration.
+
+```
+composer require contributte/console
+```
+
+```yaml
+extensions:
+    console: Contributte\Console\DI\ConsoleExtension
+```
+
 ## Configuration
 
-Optional configuration.
+You should define paths where the fixture classes are stored.
 
 ```yaml
 fixtures:
@@ -37,7 +47,7 @@ The **doctrine:fixtures:load** command loads data fixtures from your configurati
 doctrine:fixtures:load
 ```
 
-You can also optionally specify the path to fixtures with the **--fixtures** option:
+You can also optionally specify the path to the fixtures with the **--fixtures** option:
 
 ```
 doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2
@@ -49,8 +59,8 @@ If you want to append the fixtures instead of flushing the database first you ca
 doctrine:fixtures:load --append
 ```
 
-By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from
-the database. If you want to use a TRUNCATE statement instead you can use the **--purge-with-truncate** flag:
+By default `Doctrine Fixtures` uses `DELETE` statements to drop the existing rows from
+the database. If you want to use a `TRUNCATE` statement instead, you can use the **--purge-with-truncate** flag:
 
 ```
 doctrine:fixtures:load --purge-with-truncate
@@ -58,17 +68,17 @@ doctrine:fixtures:load --purge-with-truncate
 
 ## Fixture
 
-Simplest use of fixture is implement **Doctrine\Common\DataFixtures\FixtureInterface**
+Simpliest fixture implements just **Doctrine\Common\DataFixtures\FixtureInterface**
 
 ```php
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class CommonFixture implements FixtureInterface
+class Foo1Fixture implements FixtureInterface
 {
 
 	/**
-	 * Load data fixtures with the passed EntityManager
+	 * Load data fixtures with the passed ObjectManager
 	 *
 	 * @param ObjectManager $manager
 	 * @return void
@@ -89,11 +99,11 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class CommonFixture implements FixtureInterface, OrderedFixtureInterface
+class Foo2Fixture implements FixtureInterface, OrderedFixtureInterface
 {
 
 	/**
-	 * Load data fixtures with the passed EntityManager
+	 * Load data fixtures with the passed ObjectManager
 	 *
 	 * @param ObjectManager $manager
 	 * @return void
@@ -122,11 +132,11 @@ If you need use referencing, extend **Doctrine\Common\DataFixtures\AbstractFixtu
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class CommonFixture extends AbstractFixture
+class Foo3Fixture extends AbstractFixture
 {
 
 	/**
-	 * Load data fixtures with the passed EntityManager
+	 * Load data fixtures with the passed ObjectManager
 	 *
 	 * @param ObjectManager $manager
 	 */
@@ -149,7 +159,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Nette\DI\Container;
 
-class CommonFixture implements FixtureInterface, ContainerAwareInterface
+class Foo4Fixture implements FixtureInterface, ContainerAwareInterface
 {
 
 	/** @var Container */
@@ -165,7 +175,7 @@ class CommonFixture implements FixtureInterface, ContainerAwareInterface
 	}
 
 	/**
-	 * Load data fixtures with the passed EntityManager
+	 * Load data fixtures with the passed ObjectManager
 	 *
 	 * @param ObjectManager $manager
 	 */
