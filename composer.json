@@ -1,6 +1,6 @@
 {
   "name": "nettrine/fixtures",
-  "description": "Fixtures",
+  "description": "Doctrine Fixtures for Nette Framework",
   "keywords": ["nette", "doctrine", "fixtures"],
   "type": "library",
   "license": ["MIT"],
