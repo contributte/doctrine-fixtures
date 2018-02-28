@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types = 1);
 
-namespace Tests\Fixture;
+namespace Tests\Nettrine\Fixtures\Fixture;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -17,7 +17,7 @@ class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 	 * @param Container $container
 	 * @return void
 	 */
-	public function setContainer(Container $container)
+	public function setContainer(Container $container): void
 	{
 		$this->container = $container;
 	}
@@ -25,7 +25,7 @@ class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 	/**
 	 * @return Container|NULL
 	 */
-	public function getContainer()
+	public function getContainer(): ?Container
 	{
 		return $this->container;
 	}
@@ -34,7 +34,7 @@ class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 	 * @param ObjectManager $manager
 	 * @return void
 	 */
-	public function load(ObjectManager $manager)
+	public function load(ObjectManager $manager): void
 	{
 	}
 

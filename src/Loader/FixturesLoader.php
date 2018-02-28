@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Nettrine\Fixtures\Loader;
 
@@ -30,7 +30,7 @@ class FixturesLoader extends Loader
 	 * @param string[] $paths
 	 * @return void
 	 */
-	public function loadPaths(array $paths)
+	public function loadPaths(array $paths): void
 	{
 		foreach ($paths as $path) {
 			if (is_dir($path)) {
@@ -44,7 +44,7 @@ class FixturesLoader extends Loader
 	/**
 	 * @return void
 	 */
-	public function load()
+	public function load(): void
 	{
 		$this->loadPaths($this->paths);
 	}
@@ -53,7 +53,7 @@ class FixturesLoader extends Loader
 	 * @param FixtureInterface $fixture
 	 * @return void
 	 */
-	public function addFixture(FixtureInterface $fixture)
+	public function addFixture(FixtureInterface $fixture): void
 	{
 		if ($fixture instanceof ContainerAwareInterface) {
 			$fixture->setContainer($this->container);
@@ -64,7 +64,7 @@ class FixturesLoader extends Loader
 	/**
 	 * @return string[]
 	 */
-	public function getPaths()
+	public function getPaths(): array
 	{
 		return $this->paths;
 	}

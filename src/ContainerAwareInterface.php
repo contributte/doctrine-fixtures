@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Nettrine\Fixtures;
 
@@ -11,6 +11,6 @@ interface ContainerAwareInterface
 	 * @param Container $container
 	 * @return void
 	 */
-	public function setContainer(Container $container);
+	public function setContainer(Container $container): void;
 
 }

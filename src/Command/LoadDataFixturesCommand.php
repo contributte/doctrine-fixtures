@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Nettrine\Fixtures\Command;
 
@@ -45,7 +45,7 @@ class LoadDataFixturesCommand extends Command
 	 *
 	 * @return void
 	 */
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
 			->setName('doctrine:fixtures:load')
@@ -96,7 +96,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 	 * @param OutputInterface $output
 	 * @return int
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		/** @var EntityManager $em */
 		$em = $this->managerRegistry->getManager($input->getOption('em'));
@@ -136,7 +136,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 		$purger->setPurgeMode($input->getOption('purge-with-truncate') ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
-		$executor->setLogger(function ($message) use ($output) {
+		$executor->setLogger(function ($message) use ($output): void {
 			$output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
 		});
 		$executor->execute($fixtures, $input->getOption('append'));
@@ -152,7 +152,12 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 	 * @param bool $default
 	 * @return bool
 	 */
-	private function askConfirmation(InputInterface $input, OutputInterface $output, $question, $default)
+	private function askConfirmation(
+		InputInterface $input,
+		OutputInterface $output,
+		string $question,
+		bool $default
+	): bool
 	{
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelperSet()->get('question');
