@@ -29,10 +29,6 @@ class LoadDataFixturesCommand extends Command
 	/** @var ManagerRegistry */
 	private $managerRegistry;
 
-	/**
-	 * @param FixturesLoader $loader
-	 * @param ManagerRegistry $managerRegistry
-	 */
 	public function __construct(FixturesLoader $loader, ManagerRegistry $managerRegistry)
 	{
 		parent::__construct();
@@ -42,8 +38,6 @@ class LoadDataFixturesCommand extends Command
 
 	/**
 	 * Configures the current command.
-	 *
-	 * @return void
 	 */
 	protected function configure(): void
 	{
@@ -52,20 +46,20 @@ class LoadDataFixturesCommand extends Command
 			->setDescription('Load data fixtures to your database.')
 			->addOption(
 				'fixtures',
-				NULL,
+				null,
 				InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
 				'The directory to load data fixtures from.'
 			)
 			->addOption(
 				'append',
-				NULL,
+				null,
 				InputOption::VALUE_NONE,
 				'Append the data fixtures instead of deleting all data from the database first.'
 			)
-			->addOption('em', NULL, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
+			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
 			->addOption(
 				'purge-with-truncate',
-				NULL,
+				null,
 				InputOption::VALUE_NONE,
 				'Purge data by using a database-level TRUNCATE statement'
 			)
@@ -91,11 +85,6 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 ');
 	}
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		/** @var EntityManager $em */
@@ -106,7 +95,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 				$input,
 				$output,
 				'<question>Careful, database will be purged. Do you want to continue y/N ?</question>',
-				FALSE
+				false
 			)
 			) {
 				return 1;
@@ -145,13 +134,6 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 		return 0;
 	}
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @param string $question
-	 * @param bool $default
-	 * @return bool
-	 */
 	private function askConfirmation(
 		InputInterface $input,
 		OutputInterface $output,

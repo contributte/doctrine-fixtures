@@ -27,7 +27,7 @@ composer require nettrine/fixtures
 | State    | Version       | Branch   | PHP      |
 |----------|---------------|----------|----------|
 | stable   | `^0.3`        | `master` | `>= 7.1` |
-| stable   |  `0.2`        | `master` | `>= 5.6` |
+| stable   | `^0.2`        | `master` | `>= 5.6` |
 
 ## Overview
 

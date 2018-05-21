@@ -14,9 +14,6 @@ class FixturesExtension extends CompilerExtension
 		'paths' => [],
 	];
 
-	/**
-	 * @return void
-	 */
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
@@ -27,7 +24,7 @@ class FixturesExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('loadDataFixturesCommand'))
 			->setClass(LoadDataFixturesCommand::class)
-			->setInject(FALSE);
+			->setInject(false);
 	}
 
 }

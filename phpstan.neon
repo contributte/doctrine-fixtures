@@ -3,3 +3,4 @@ includes:
 	- temp/phpstan/vendor/phpstan/phpstan-nette/rules.neon
 
 parameters:
+    ignoreErrors:

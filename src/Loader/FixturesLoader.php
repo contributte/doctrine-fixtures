@@ -18,7 +18,6 @@ class FixturesLoader extends Loader
 
 	/**
 	 * @param string[] $paths
-	 * @param Container $container
 	 */
 	public function __construct(array $paths, Container $container)
 	{
@@ -28,7 +27,6 @@ class FixturesLoader extends Loader
 
 	/**
 	 * @param string[] $paths
-	 * @return void
 	 */
 	public function loadPaths(array $paths): void
 	{
@@ -41,18 +39,11 @@ class FixturesLoader extends Loader
 		}
 	}
 
-	/**
-	 * @return void
-	 */
 	public function load(): void
 	{
 		$this->loadPaths($this->paths);
 	}
 
-	/**
-	 * @param FixtureInterface $fixture
-	 * @return void
-	 */
 	public function addFixture(FixtureInterface $fixture): void
 	{
 		if ($fixture instanceof ContainerAwareInterface) {

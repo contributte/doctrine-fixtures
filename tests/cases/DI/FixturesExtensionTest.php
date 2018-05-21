@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\Nettrine\Fixtures\DI;
+namespace Tests\Nettrine\Fixtures\Cases\DI;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Mockery;
@@ -10,26 +10,23 @@ use Nette\DI\ContainerLoader;
 use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
 use Nettrine\Fixtures\DI\FixturesExtension;
 use Nettrine\Fixtures\Loader\FixturesLoader;
-use Tests\Nettrine\Fixtures\Fixture\ContainerFixture;
-use Tests\Nettrine\Fixtures\TestCase;
+use Tests\Nettrine\Fixtures\Cases\Fixture\ContainerFixture;
+use Tests\Nettrine\Fixtures\Cases\TestCase;
 
 final class FixturesExtensionTest extends TestCase
 {
 
-	/**
-	 * @return void
-	 */
 	public function testRegister(): void
 	{
 		$managerRegistry = Mockery::mock(ManagerRegistry::class);
 
-		$loader = new ContainerLoader(TEMP_PATH, TRUE);
+		$loader = new ContainerLoader(TEMP_PATH, true);
 		$class = $loader->load(function (Compiler $compiler) use ($managerRegistry): void {
 			//Fixtures
 			$compiler->getContainerBuilder()
 				->addDefinition('managerRegistry')
 				->setClass(ManagerRegistry::class)
-				->setDynamic(TRUE);
+				->setDynamic(true);
 			$compiler->addExtension('fixtures', new FixturesExtension());
 		}, '1a');
 
