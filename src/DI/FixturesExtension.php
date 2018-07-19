@@ -24,7 +24,8 @@ class FixturesExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('loadDataFixturesCommand'))
 			->setClass(LoadDataFixturesCommand::class)
-			->setInject(false);
+			->setInject(false)
+			->addTag('console.command', 'doctrine:fixtures:load');
 	}
 
 }
