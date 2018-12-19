@@ -21,7 +21,7 @@ final class FixturesExtensionTest extends TestCase
 		$managerRegistry = Mockery::mock(ManagerRegistry::class);
 
 		$loader = new ContainerLoader(TEMP_PATH, true);
-		$class = $loader->load(function (Compiler $compiler) use ($managerRegistry): void {
+		$class = $loader->load(function (Compiler $compiler): void {
 			//Fixtures
 			$compiler->getContainerBuilder()
 				->addDefinition('managerRegistry')
