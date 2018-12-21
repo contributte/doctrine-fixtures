@@ -29,6 +29,9 @@ class LoadDataFixturesCommand extends Command
 	/** @var ManagerRegistry */
 	private $managerRegistry;
 
+	/** @var string */
+	protected static $defaultName = 'doctrine:fixtures:load';
+
 	public function __construct(FixturesLoader $loader, ManagerRegistry $managerRegistry)
 	{
 		parent::__construct();
@@ -42,7 +45,7 @@ class LoadDataFixturesCommand extends Command
 	protected function configure(): void
 	{
 		$this
-			->setName('doctrine:fixtures:load')
+			->setName(static::$defaultName)
 			->setDescription('Load data fixtures to your database.')
 			->addOption(
 				'fixtures',
