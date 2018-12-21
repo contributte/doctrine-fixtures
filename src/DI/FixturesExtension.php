@@ -20,10 +20,10 @@ class FixturesExtension extends CompilerExtension
 		$config = $this->validateConfig($this->defaults);
 
 		$builder->addDefinition($this->prefix('fixturesLoader'))
-			->setClass(FixturesLoader::class, [$config['paths']]);
+			->setFactory(FixturesLoader::class, [$config['paths']]);
 
 		$builder->addDefinition($this->prefix('loadDataFixturesCommand'))
-			->setClass(LoadDataFixturesCommand::class)
+			->setFactory(LoadDataFixturesCommand::class)
 			->setInject(false)
 			->addTag('console.command', 'doctrine:fixtures:load');
 	}
