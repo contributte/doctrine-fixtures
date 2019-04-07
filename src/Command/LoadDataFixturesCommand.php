@@ -115,7 +115,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 		}
 
 		$fixtures = $this->loader->getFixtures();
-		if (!$fixtures) {
+		if ($fixtures === []) {
 			throw new InvalidArgumentException(
 				sprintf(
 					'Could not find any fixtures to load in: %s',

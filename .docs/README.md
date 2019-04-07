@@ -1,15 +1,23 @@
-# Fixtures
+# Nettrine Fixtures
+
+[Doctrine\DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
 
 ## Content
 
-- [Usage - how to register](#usage)
-- [Extension - how to configure](#configuration)
-- [Command - how to use command](#command)
-- [Fixture - how to write fixtures](#fixture)
+- [Setup](#usage)
+- [Configuration](#configuration)
+- [Usage](#command)
+- [Fixture - create own fixtures](#fixture)
 
-## Usage
+## Setup
 
-At first you should register `FixturesExtension` at your config file.
+Install package
+
+```bash
+composer require nettrine/fixtures
+```
+
+Register extension
 
 ```yaml
 extensions:
@@ -39,7 +47,7 @@ fixtures:
         - ...
 ```
 
-## Command
+## Usage
 
 The **doctrine:fixtures:load** command loads data fixtures from your configuration by default:
 

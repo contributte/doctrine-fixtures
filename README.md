@@ -1,8 +1,6 @@
-# Fixtures
+# Nettrine Fixtures
 
-[Doctrine\DataFixtures](https://github.com/doctrine/data-fixtures) to Nette Framework
-
------
+[Doctrine\DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
 
 [![Build Status](https://img.shields.io/travis/nettrine/fixtures.svg?style=flat-square)](https://travis-ci.org/nettrine/fixtures)
 [![Code coverage](https://img.shields.io/coveralls/nettrine/fixtures.svg?style=flat-square)](https://coveralls.io/r/nettrine/fixtures)
@@ -16,26 +14,19 @@
 
 [![Join the chat](https://img.shields.io/gitter/room/nettrine/nettrine.svg?style=flat-square)](https://gitter.im/nettrine/nettrine)
 
-## Install
+## Documentation
 
-```sh
-composer require nettrine/fixtures
-```
+- [Setup](.docs/README.md#usage)
+- [Configuration](.docs/README.md#configuration)
+- [Usage](.docs/README.md#command)
+- [Fixture - create own fixtures](.docs/README.md#fixture)
 
 ## Versions
 
-| State       | Version       | Branch   | PHP      |
-|-------------|---------------|----------|----------|
-| development | `^0.5`        | `master` | `>= 7.1` |
-| stable      | `^0.4`        | `master` | `>= 7.1` |
-| stable      | `^0.2`        | `master` | `>= 5.6` |
-
-## Overview
-
-- [Usage - how to register](https://github.com/nettrine/fixtures/blob/master/.docs/README.md#usage)
-- [Extension - how to configure](https://github.com/nettrine/fixtures/blob/master/.docs/README.md#configuration)
-- [Command - how to use command](https://github.com/nettrine/fixtures/blob/master/.docs/README.md#command)
-- [Fixture - how to write fixtures](https://github.com/nettrine/fixtures/blob/master/.docs/README.md#fixture)
+| State       | Version       | Branch   | Nette  | PHP    |
+|-------------|---------------|----------|--------|--------|
+| development | `^0.5`        | `master` | `3.0+` | `^7.2` |
+| stable      | `^0.4`        | `master` | `2.4`  | `^7.1` |
 
 ## Maintainers
 
@@ -59,7 +50,5 @@ composer require nettrine/fixtures
     </tr>
   </tbody>
 </table>
-
------
 
 Thank you for testing, reporting and contributing.
