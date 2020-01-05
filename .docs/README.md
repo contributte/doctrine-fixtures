@@ -1,13 +1,16 @@
 # Nettrine Fixtures
 
-[Doctrine\DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
+[Doctrine/DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
+
 
 ## Content
 
 - [Setup](#usage)
+- [Relying](#relying)
 - [Configuration](#configuration)
-- [Usage](#command)
-- [Fixture - create own fixtures](#fixture)
+- [Usage](#usage)
+- [Examples](#examples)
+
 
 ## Setup
 
@@ -21,60 +24,98 @@ Register extension
 
 ```yaml
 extensions:
-    fixtures: Nettrine\Fixtures\DI\FixturesExtension
+  nettrine.fixtures: Nettrine\Fixtures\DI\FixturesExtension
 ```
 
-This extension is highly depending on `Symfony\Console`, it does not make sence to use it without `Console`. Take
-a look at simple [Contributte/Console](https://github.com/contributte/console) integration.
 
+## Relying
+
+Take advantage of enpowering this package with 2 extra packages:
+
+- `doctrine/orm`
+- `symfony/console`
+
+
+### `doctrine/orm`
+
+This package relies on `doctrine/orm`, use prepared [nettrine/orm](https://github.com/nettrine/orm) integration.
+Doctrine ORM depends on Doctrine DBAL, use prepared [nettrine/dbal](https://github.com/nettrine/dbal) integration
+
+```bash
+composer require nettrine/dbal
+composer require nettrine/orm
 ```
+
+Without these packages you can't process fixtures, because fixtures needs connection to database and information about entities.
+
+
+### `symfony/console`
+
+This package relies on `symfony/console`, use prepared [contributte/console](https://github.com/contributte/console) integration.
+
+```bash
 composer require contributte/console
 ```
 
 ```yaml
 extensions:
-    console: Contributte\Console\DI\ConsoleExtension
+  console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
 ```
 
+
 ## Configuration
+
+**Schema definition**
+
+```yaml
+nettrine.fixtures:
+  paths: <string[]>
+```
+
+**Under the hood**
 
 You should define paths where the fixture classes are stored.
 
 ```yaml
-fixtures:
-    paths:
-        - app/model/Fixtures
-        - ...
+nettrine.fixtures:
+  paths:
+    - %appDir%/fixtures
 ```
 
+
 ## Usage
+
+Type `bin/console` in your terminal and there should be a `doctrine:fixtures` command group.
 
 The **doctrine:fixtures:load** command loads data fixtures from your configuration by default:
 
 ```
-doctrine:fixtures:load
+bin/console doctrine:fixtures:load
 ```
 
 You can also optionally specify the path to the fixtures with the **--fixtures** option:
 
 ```
-doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2
+bin/console doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2
 ```
 
 If you want to append the fixtures instead of flushing the database first you can use the **--append** option:
 
 ```
-doctrine:fixtures:load --append
+bin/console doctrine:fixtures:load --append
 ```
 
 By default `Doctrine Fixtures` uses `DELETE` statements to drop the existing rows from
 the database. If you want to use a `TRUNCATE` statement instead, you can use the **--purge-with-truncate** flag:
 
 ```
-doctrine:fixtures:load --purge-with-truncate
+bin/console doctrine:fixtures:load --purge-with-truncate
 ```
 
-## Fixture
+![Console Commands](https://raw.githubusercontent.com/nettrine/fixtures/master/.docs/assets/console.png)
+
+
+### Fixture
 
 Simpliest fixture implements just **Doctrine\Common\DataFixtures\FixtureInterface**
 
@@ -85,16 +126,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 class Foo1Fixture implements FixtureInterface
 {
 
-	/**
-	 * Load data fixtures with the passed ObjectManager
-	 *
-	 * @param ObjectManager $manager
-	 * @return void
-	 */
-	public function load(ObjectManager $manager)
-	{
-		// TODO: Implement load() method.
-	}
+  /**
+   * Load data fixtures with the passed ObjectManager
+   */
+  public function load(ObjectManager $manager): void
+  {
+  }
 
 }
 ```
@@ -110,26 +147,20 @@ use Doctrine\Common\Persistence\ObjectManager;
 class Foo2Fixture implements FixtureInterface, OrderedFixtureInterface
 {
 
-	/**
-	 * Load data fixtures with the passed ObjectManager
-	 *
-	 * @param ObjectManager $manager
-	 * @return void
-	 */
-	public function load(ObjectManager $manager)
-	{
-		// TODO: Implement load() method.
-	}
+  /**
+   * Load data fixtures with the passed ObjectManager
+   */
+  public function load(ObjectManager $manager): void
+  {
+  }
 
-	/**
-	 * Get the order of this fixture
-	 *
-	 * @return int
-	 */
-	public function getOrder()
-	{
-		return 1;
-	}
+  /**
+   * Get the order of this fixture
+   */
+  public function getOrder(): int
+  {
+    return 1;
+  }
 
 }
 ```
@@ -143,17 +174,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 class Foo3Fixture extends AbstractFixture
 {
 
-	/**
-	 * Load data fixtures with the passed ObjectManager
-	 *
-	 * @param ObjectManager $manager
-	 */
-	public function load(ObjectManager $manager)
-	{
-		// TODO: Implement load() method.
-		$this->addReference('user', new User());
-		$this->getReference('user');
-	}
+  /**
+   * Load data fixtures with the passed ObjectManager
+   */
+  public function load(ObjectManager $manager): void
+  {
+    $this->addReference('user', new User());
+    $this->getReference('user');
+  }
 
 }
 ```
@@ -170,28 +198,26 @@ use Nette\DI\Container;
 class Foo4Fixture implements FixtureInterface, ContainerAwareInterface
 {
 
-	/** @var Container */
-	private $container;
+  /** @var Container */
+  private $container;
 
-	/**
-	 * @param Container $container
-	 * @return void
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-	}
+  public function setContainer(Container $container)
+  {
+    $this->container = $container;
+  }
 
-	/**
-	 * Load data fixtures with the passed ObjectManager
-	 *
-	 * @param ObjectManager $manager
-	 */
-	public function load(ObjectManager $manager)
-	{
-		// TODO: Implement load() method.
-		$this->container->getService('foo');
-	}
+  /**
+   * Load data fixtures with the passed ObjectManager
+   */
+  public function load(ObjectManager $manager): void
+  {
+    $this->container->getService('foo');
+  }
 
 }
 ```
+
+
+## Examples
+
+You can find more examples in [planette playground](https://github.com/planette/playground) repository.

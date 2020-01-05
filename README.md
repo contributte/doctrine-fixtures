@@ -1,6 +1,6 @@
 # Nettrine Fixtures
 
-[Doctrine\DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
+[Doctrine/DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
 
 [![Build Status](https://img.shields.io/travis/nettrine/fixtures.svg?style=flat-square)](https://travis-ci.org/nettrine/fixtures)
 [![Code coverage](https://img.shields.io/coveralls/nettrine/fixtures.svg?style=flat-square)](https://coveralls.io/r/nettrine/fixtures)
@@ -17,9 +17,10 @@
 ## Documentation
 
 - [Setup](.docs/README.md#usage)
+- [Relying](.docs/README.md#relying)
 - [Configuration](.docs/README.md#configuration)
-- [Usage](.docs/README.md#command)
-- [Fixture - create own fixtures](.docs/README.md#fixture)
+- [Usage](.docs/README.md#usage)
+- [Examples](.docs/README.md#examples)
 
 ## Versions
 
