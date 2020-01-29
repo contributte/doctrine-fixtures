@@ -46,7 +46,7 @@ composer require nettrine/dbal
 composer require nettrine/orm
 ```
 
-Without these packages you can't process fixtures, because fixtures needs connection to database and information about entities.
+Without these packages the fixtures can't be processed, because they need a database connection and entities information.
 
 
 ### `symfony/console`
@@ -99,7 +99,7 @@ You can also optionally specify the path to the fixtures with the **--fixtures**
 bin/console doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2
 ```
 
-If you want to append the fixtures instead of flushing the database first you can use the **--append** option:
+If you want to append the fixtures instead of first flushing the database you can use the **--append** option:
 
 ```
 bin/console doctrine:fixtures:load --append
@@ -117,7 +117,7 @@ bin/console doctrine:fixtures:load --purge-with-truncate
 
 ### Fixture
 
-Simpliest fixture implements just **Doctrine\Common\DataFixtures\FixtureInterface**
+The simplest fixture just implements **Doctrine\Common\DataFixtures\FixtureInterface**
 
 ```php
 use Doctrine\Common\DataFixtures\FixtureInterface;
@@ -136,7 +136,7 @@ class Foo1Fixture implements FixtureInterface
 }
 ```
 
-If you need use ordering, implement **Doctrine\Common\DataFixtures\OrderedFixtureInterface**
+If you need to run the fixtures in a fixed succession, implement **Doctrine\Common\DataFixtures\OrderedFixtureInterface**
 
 
 ```php
@@ -165,7 +165,7 @@ class Foo2Fixture implements FixtureInterface, OrderedFixtureInterface
 }
 ```
 
-If you need use referencing, extend **Doctrine\Common\DataFixtures\AbstractFixture**
+If you need to use referencing, extend **Doctrine\Common\DataFixtures\AbstractFixture**
 
 ```php
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -186,7 +186,7 @@ class Foo3Fixture extends AbstractFixture
 }
 ```
 
-If you need use container, implement **Nettrine\Fixtures\ContainerAwareInterface**
+If you need to use the Container, implement **Nettrine\Fixtures\ContainerAwareInterface**
 
 
 ```php
