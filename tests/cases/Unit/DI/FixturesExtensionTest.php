@@ -10,9 +10,9 @@ use Nette\DI\ContainerLoader;
 use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
 use Nettrine\Fixtures\DI\FixturesExtension;
 use Nettrine\Fixtures\Loader\FixturesLoader;
-use Tests\Fixtures\ContainerFixture;
 use Tester\Assert;
 use Tester\TestCase;
+use Tests\Fixtures\ContainerFixture;
 
 require_once __DIR__ . '/../../../bootstrap.php';
 

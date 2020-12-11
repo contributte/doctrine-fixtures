@@ -49,6 +49,7 @@ class FixturesLoader extends Loader
 		if ($fixture instanceof ContainerAwareInterface) {
 			$fixture->setContainer($this->container);
 		}
+
 		parent::addFixture($fixture);
 	}
 
