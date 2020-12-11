@@ -4,8 +4,8 @@ namespace Nettrine\Fixtures\Command;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
 use Nettrine\Fixtures\Loader\FixturesLoader;
 use Symfony\Component\Console\Command\Command;

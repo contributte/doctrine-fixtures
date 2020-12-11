@@ -3,7 +3,7 @@
 namespace Tests\Fixtures;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Nette\DI\Container;
 use Nettrine\Fixtures\ContainerAwareInterface;
 

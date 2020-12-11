@@ -2,7 +2,7 @@
 
 namespace Tests\Cases\Unit\DI;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Mockery;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
@@ -11,14 +11,17 @@ use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
 use Nettrine\Fixtures\DI\FixturesExtension;
 use Nettrine\Fixtures\Loader\FixturesLoader;
 use Tests\Fixtures\ContainerFixture;
-use Tests\Toolkit\TestCase;
+use Tester\Assert;
+use Tester\TestCase;
+
+require_once __DIR__ . '/../../../bootstrap.php';
 
 final class FixturesExtensionTest extends TestCase
 {
 
 	public function testLoad(): void
 	{
-		$loader = new ContainerLoader(TEMP_PATH, true);
+		$loader = new ContainerLoader(TMP_DIR, true);
 		$class = $loader->load(function (Compiler $compiler): void {
 			// Manager registry is needed for console command
 			// It's also provided by nettrine/orm package
@@ -45,24 +48,24 @@ final class FixturesExtensionTest extends TestCase
 
 		/** @var FixturesLoader $loader */
 		$loader = $container->getByType(FixturesLoader::class);
-		$this->assertInstanceOf(FixturesLoader::class, $loader);
+		Assert::type(FixturesLoader::class, $loader);
 
 		// Load fixtures
 		$loader->load();
 
 		/** @var ContainerFixture $containerFixture */
 		$containerFixture = $loader->getFixture(ContainerFixture::class);
-		$this->assertInstanceOf(ContainerFixture::class, $containerFixture);
-		$this->assertInstanceOf(Container::class, $containerFixture->getContainer());
+		Assert::type(ContainerFixture::class, $containerFixture);
+		Assert::type(Container::class, $containerFixture->getContainer());
 
 		/** @var LoadDataFixturesCommand $command */
 		$command = $container->getByType(LoadDataFixturesCommand::class);
-		$this->assertInstanceOf(LoadDataFixturesCommand::class, $command);
+		Assert::type(LoadDataFixturesCommand::class, $command);
 	}
 
 	public function testLoadPaths(): void
 	{
-		$loader = new ContainerLoader(TEMP_PATH, true);
+		$loader = new ContainerLoader(TMP_DIR, true);
 		$class = $loader->load(function (Compiler $compiler): void {
 			// Manager registry is needed for console command
 			// It's also provided by nettrine/orm package
@@ -85,8 +88,10 @@ final class FixturesExtensionTest extends TestCase
 
 		/** @var ContainerFixture $containerFixture */
 		$containerFixture = $loader->getFixture(ContainerFixture::class);
-		$this->assertInstanceOf(ContainerFixture::class, $containerFixture);
-		$this->assertInstanceOf(Container::class, $containerFixture->getContainer());
+		Assert::type(ContainerFixture::class, $containerFixture);
+		Assert::type(Container::class, $containerFixture->getContainer());
 	}
 
 }
+
+(new FixturesExtensionTest())->run();
