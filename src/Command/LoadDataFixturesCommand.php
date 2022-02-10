@@ -17,8 +17,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * @see http://symfony.com/doc/2.2/bundles/DoctrineFixturesBundle/index.html
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class LoadDataFixturesCommand extends Command
 {
@@ -90,10 +88,14 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
-		/** @var EntityManager $em */
-		$em = $this->managerRegistry->getManager($input->getOption('em'));
+		/** @var string|null $em */
+		$em = $input->getOption('em');
 
-		if ($input->isInteractive() && !$input->getOption('append')) {
+		/** @var EntityManager $em */
+		$em = $this->managerRegistry->getManager($em);
+
+		$append = $input->getOption('append');
+		if ($input->isInteractive() && $append !== null && $append !== '') {
 			if (!$this->askConfirmation(
 				$input,
 				$output,
@@ -106,7 +108,7 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 		}
 
 		$dirOrFile = $input->getOption('fixtures');
-		if ($dirOrFile) {
+		if ($dirOrFile !== null && $dirOrFile !== '') {
 			$paths = is_array($dirOrFile) ? $dirOrFile : [$dirOrFile];
 			$this->loader->loadPaths($paths);
 		} else {
@@ -124,14 +126,15 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 			);
 		}
 
+		$purgeTruncate = $input->getOption('purge-with-truncate');
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($input->getOption('purge-with-truncate') ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($purgeTruncate !== null && $purgeTruncate !== '' ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
 		$executor->setLogger(function ($message) use ($output): void {
 			$output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
 		});
-		$executor->execute($fixtures, $input->getOption('append'));
+		$executor->execute($fixtures, (bool) $append);
 		//$executor->execute($fixtures, $input->getOption('append'), $input->getOption('multiple-transactions'));
 
 		return 0;
@@ -144,11 +147,17 @@ the database. If you want to use a TRUNCATE statement instead you can use the <i
 		bool $default
 	): bool
 	{
+		$set = $this->getHelperSet();
+
+		if ($set === null) {
+			return false;
+		}
+
 		/** @var QuestionHelper $questionHelper */
-		$questionHelper = $this->getHelperSet()->get('question');
+		$questionHelper = $set->get('question');
 		$question = new ConfirmationQuestion($question, $default);
 
-		return $questionHelper->ask($input, $output, $question);
+		return (bool) $questionHelper->ask($input, $output, $question);
 	}
 
 }

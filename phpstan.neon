@@ -5,6 +5,12 @@ includes:
 	- vendor/phpstan/phpstan-strict-rules/rules.neon
 
 parameters:
-	excludes_analyse:
-		# Symfony/Console have too magic api
-		- src/Command/LoadDataFixturesCommand.php
+	level: 9
+	phpVersion: 70200
+
+	paths:
+		- src
+
+	reportMaybesInPropertyPhpDocTypes: false
+
+	ignoreErrors:

@@ -36,11 +36,11 @@ final class FixturesExtensionTest extends TestCase
 				],
 				'fixtures' => [
 					'paths' => [
-						'%rootPath%/tests/fixtures',
+						'%rootPath%/tests/Fixtures',
 					],
 				],
 			]);
-		}, 'di1');
+		}, __METHOD__ . '1');
 
 		/** @var Container $container */
 		$container = new $class();
@@ -74,7 +74,7 @@ final class FixturesExtensionTest extends TestCase
 				->setType(ManagerRegistry::class);
 
 			$compiler->addExtension('fixtures', new FixturesExtension());
-		}, 'di2');
+		}, __FILE__ . '2');
 
 		/** @var Container $container */
 		$container = new $class();
@@ -84,7 +84,7 @@ final class FixturesExtensionTest extends TestCase
 		$loader = $container->getByType(FixturesLoader::class);
 
 		// Load fixtures manually with given paths
-		$loader->loadPaths([__DIR__ . '/../../../fixtures']);
+		$loader->loadPaths([__DIR__ . '/../../../Fixtures']);
 
 		/** @var ContainerFixture $containerFixture */
 		$containerFixture = $loader->getFixture(ContainerFixture::class);
