@@ -1,4 +1,4 @@
-# Nettrine Fixtures
+# Contributte Doctrine Fixtures
 
 [Doctrine/DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
 
@@ -38,8 +38,8 @@ Take advantage of enpowering this package with 2 extra packages:
 
 ### `doctrine/orm`
 
-This package relies on `doctrine/orm`, use prepared [nettrine/orm](https://github.com/nettrine/orm) integration.
-Doctrine ORM depends on Doctrine DBAL, use prepared [nettrine/dbal](https://github.com/nettrine/dbal) integration
+This package relies on `doctrine/orm`, use prepared [nettrine/orm](https://github.com/contributte/doctrine-orm) integration.
+Doctrine ORM depends on Doctrine DBAL, use prepared [nettrine/dbal](https://github.com/contributte/doctrine-dbal) integration
 
 ```bash
 composer require nettrine/dbal

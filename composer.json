@@ -4,7 +4,7 @@
   "keywords": ["nette", "doctrine", "fixtures"],
   "type": "library",
   "license": "MIT",
-  "homepage": "https://github.com/nettrine/fixtures",
+  "homepage": "https://github.com/contributte/doctrine-fixtures",
   "authors": [
     {
       "name": "Milan Felix Šulc",

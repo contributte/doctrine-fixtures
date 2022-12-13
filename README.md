@@ -1,14 +1,14 @@
-![](https://heatbadger.now.sh/github/readme/nettrine/fixtures/)
+![](https://heatbadger.now.sh/github/readme/contributte/doctrine-fixtures/)
 
 <p align=center>
-  <a href="https://github.com/nettrine/fixtures/actions"><img src="https://badgen.net/github/checks/nettrine/fixtures/master?cache=300"></a>
+  <a href="https://github.com/contributte/doctrine-fixtures/actions"><img src="https://badgen.net/github/checks/nettrine/fixtures/master?cache=300"></a>
   <a href="https://coveralls.io/r/nettrine/fixtures"><img src="https://badgen.net/coveralls/c/github/nettrine/fixtures?cache=300"></a>
   <a href="https://packagist.org/packages/nettrine/fixtures"><img src="https://badgen.net/packagist/dm/nettrine/fixtures"></a>
   <a href="https://packagist.org/packages/nettrine/fixtures"><img src="https://badgen.net/packagist/v/nettrine/fixtures"></a>
 </p>
 <p align=center>
   <a href="https://packagist.org/packages/nettrine/fixtures"><img src="https://badgen.net/packagist/php/nettrine/fixtures"></a>
-  <a href="https://github.com/nettrine/fixtures"><img src="https://badgen.net/github/license/nettrine/fixtures"></a>
+  <a href="https://github.com/contributte/doctrine-fixtures"><img src="https://badgen.net/github/license/contributte/doctrine-fixtures"></a>
   <a href="https://bit.ly/ctteg"><img src="https://badgen.net/badge/support/gitter/cyan"></a>
   <a href="https://bit.ly/cttfo"><img src="https://badgen.net/badge/support/forum/yellow"></a>
   <a href="https://contributte.org/partners.html"><img src="https://badgen.net/badge/sponsor/donations/F96854"></a>
