@@ -10,8 +10,7 @@ use Nettrine\Fixtures\ContainerAwareInterface;
 class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 {
 
-	/** @var Container|NULL */
-	private $container;
+	private Container|null $container = null;
 
 	public function setContainer(Container $container): void
 	{
@@ -25,6 +24,7 @@ class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 
 	public function load(ObjectManager $manager): void
 	{
+		// Implement in child
 	}
 
 }

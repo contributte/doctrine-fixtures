@@ -10,11 +10,10 @@ use Nettrine\Fixtures\ContainerAwareInterface;
 class FixturesLoader extends Loader
 {
 
-	/** @var Container */
-	private $container;
+	private Container $container;
 
 	/** @var string[] */
-	private $paths;
+	private array $paths = [];
 
 	/**
 	 * @param string[] $paths
