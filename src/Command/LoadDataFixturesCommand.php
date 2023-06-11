@@ -4,160 +4,99 @@ namespace Nettrine\Fixtures\Command;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use InvalidArgumentException;
 use Nettrine\Fixtures\Loader\FixturesLoader;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @see http://symfony.com/doc/2.2/bundles/DoctrineFixturesBundle/index.html
+ * Load data fixtures from bundles.
+ *
+ * @see https://github.com/doctrine/DoctrineFixturesBundle/blob/3.5.x/Command/LoadDataFixturesDoctrineCommand.php
  */
+#[AsCommand(name: 'doctrine:fixtures:load')]
 class LoadDataFixturesCommand extends Command
 {
 
-	/** @var FixturesLoader */
-	private $loader;
+	private FixturesLoader $fixturesLoader;
 
-	/** @var ManagerRegistry */
-	private $managerRegistry;
+	private ManagerRegistry $managerRegistry;
 
-	/** @var string */
-	protected static $defaultName = 'doctrine:fixtures:load';
-
-	public function __construct(FixturesLoader $loader, ManagerRegistry $managerRegistry)
+	public function __construct(FixturesLoader $fixturesLoader, ManagerRegistry $managerRegistry)
 	{
 		parent::__construct();
-		$this->loader = $loader;
+
+		$this->fixturesLoader = $fixturesLoader;
 		$this->managerRegistry = $managerRegistry;
 	}
 
-	/**
-	 * Configures the current command.
-	 */
 	protected function configure(): void
 	{
 		$this
-			->setName(static::$defaultName)
-			->setDescription('Load data fixtures to your database.')
-			->addOption(
-				'fixtures',
-				null,
-				InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-				'The directory to load data fixtures from.'
-			)
-			->addOption(
-				'append',
-				null,
-				InputOption::VALUE_NONE,
-				'Append the data fixtures instead of deleting all data from the database first.'
-			)
+			->setDescription('Load data fixtures to your database')
+			->addOption('append', null, InputOption::VALUE_NONE, 'Append the data fixtures instead of deleting all data from the database first.')
 			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
-			->addOption(
-				'purge-with-truncate',
-				null,
-				InputOption::VALUE_NONE,
-				'Purge data by using a database-level TRUNCATE statement'
-			)
-			//			->addOption('multiple-transactions', NULL, InputOption::VALUE_NONE,
-			//				'Use one transaction per fixture file instead of a single transaction for all')
-			->setHelp('
-The <info>doctrine:fixtures:load</info> command loads data fixtures from your config:
+			->addOption('purge-with-truncate', null, InputOption::VALUE_NONE, 'Purge data by using a database-level TRUNCATE statement')
+			->setHelp(<<<'EOT'
+The <info>%command.name%</info> command loads data fixtures from your application:
 
-  <info>doctrine:fixtures:load</info>
+  <info>php %command.full_name%</info>
 
-You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
+Fixtures are services that are tagged with <comment>doctrine.fixture.orm</comment>.
 
-  <info>doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
+If you want to append the fixtures instead of flushing the database first you can use the <comment>--append</comment> option:
 
-If you want to append the fixtures instead of flushing the database first you can use the <info>--append</info> option:
+  <info>php %command.full_name%</info> <comment>--append</comment>
 
-  <info>doctrine:fixtures:load --append</info>
+By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from the database.
+If you want to use a TRUNCATE statement instead you can use the <comment>--purge-with-truncate</comment> flag:
 
-By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from
-the database. If you want to use a TRUNCATE statement instead you can use the <info>--purge-with-truncate</info> flag:
+  <info>php %command.full_name%</info> <comment>--purge-with-truncate</comment>
 
-  <info>doctrine:fixtures:load --purge-with-truncate</info>
-');
+To execute only fixtures that live in a certain group, use:
+
+  <info>php %command.full_name%</info> <comment>--group=group1</comment>
+
+EOT
+			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
-		/** @var string|null $em */
-		$em = $input->getOption('em');
+		$ui = new SymfonyStyle($input, $output);
 
-		/** @var EntityManager $em */
-		$em = $this->managerRegistry->getManager($em);
+		$em = $this->managerRegistry->getManager(is_string($input->getOption('em')) ? $input->getOption('em') : null);
+		assert($em instanceof EntityManagerInterface);
 
-		$append = $input->getOption('append');
-		if ($input->isInteractive() && $append !== null && $append !== '') {
-			if (!$this->askConfirmation(
-				$input,
-				$output,
-				'<question>Careful, database will be purged. Do you want to continue y/N ?</question>',
-				false
-			)
-			) {
-				return 1;
+		if ($input->getOption('append') !== null) {
+			if (!$ui->confirm(sprintf('Careful, database "%s" will be purged. Do you want to continue?', $em->getConnection()->getDatabase()), !$input->isInteractive())) {
+				return 0;
 			}
 		}
 
-		$dirOrFile = $input->getOption('fixtures');
-		if ($dirOrFile !== null && $dirOrFile !== '' && !(is_array($dirOrFile) && count($dirOrFile) === 0)) {
-			$paths = is_array($dirOrFile) ? $dirOrFile : [$dirOrFile];
-			$this->loader->loadPaths($paths);
-		} else {
-			$this->loader->load();
-			$paths = $this->loader->getPaths();
-		}
-
-		$fixtures = $this->loader->getFixtures();
+		$fixtures = $this->fixturesLoader->getFixtures();
 		if ($fixtures === []) {
-			throw new InvalidArgumentException(
-				sprintf(
-					'Could not find any fixtures to load in: %s',
-					"\n\n- " . implode("\n- ", $paths)
-				)
-			);
+			$ui->error('Could not find any fixture services to load.');
+
+			return 1;
 		}
 
 		$purgeTruncate = $input->getOption('purge-with-truncate');
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($purgeTruncate !== null && $purgeTruncate ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($purgeTruncate !== null ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
-		$executor->setLogger(function ($message) use ($output): void {
-			$output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+		$executor->setLogger(static function ($message) use ($ui): void {
+			$ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
 		});
-		$executor->execute($fixtures, (bool) $append);
-		//$executor->execute($fixtures, $input->getOption('append'), $input->getOption('multiple-transactions'));
+		$executor->execute($fixtures, $input->getOption('append') !== null);
 
 		return 0;
-	}
-
-	private function askConfirmation(
-		InputInterface $input,
-		OutputInterface $output,
-		string $question,
-		bool $default
-	): bool
-	{
-		$set = $this->getHelperSet();
-
-		if ($set === null) {
-			return false;
-		}
-
-		/** @var QuestionHelper $questionHelper */
-		$questionHelper = $set->get('question');
-		$question = new ConfirmationQuestion($question, $default);
-
-		return (bool) $questionHelper->ask($input, $output, $question);
 	}
 
 }
