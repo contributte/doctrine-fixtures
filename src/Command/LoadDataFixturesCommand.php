@@ -79,6 +79,7 @@ EOT
 			}
 		}
 
+		$this->fixturesLoader->load();
 		$fixtures = $this->fixturesLoader->getFixtures();
 		if ($fixtures === []) {
 			$ui->error('Could not find any fixture services to load.');
