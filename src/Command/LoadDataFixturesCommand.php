@@ -73,7 +73,7 @@ EOT
 		$em = $this->managerRegistry->getManager(is_string($input->getOption('em')) ? $input->getOption('em') : null);
 		assert($em instanceof EntityManagerInterface);
 
-		if ($input->getOption('append') !== null) {
+		if ($input->getOption('append') === false) {
 			if (!$ui->confirm(sprintf('Careful, database "%s" will be purged. Do you want to continue?', $em->getConnection()->getDatabase()), !$input->isInteractive())) {
 				return 0;
 			}
@@ -89,13 +89,13 @@ EOT
 
 		$purgeTruncate = $input->getOption('purge-with-truncate');
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($purgeTruncate !== null ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($purgeTruncate !== false ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
 		$executor->setLogger(static function ($message) use ($ui): void {
 			$ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
 		});
-		$executor->execute($fixtures, $input->getOption('append') !== null);
+		$executor->execute($fixtures, $input->getOption('append') !== false);
 
 		return 0;
 	}
