@@ -93,12 +93,6 @@ The **doctrine:fixtures:load** command loads data fixtures from your configurati
 bin/console doctrine:fixtures:load
 ```
 
-You can also optionally specify the path to the fixtures with the **--fixtures** option:
-
-```
-bin/console doctrine:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2
-```
-
 If you want to append the fixtures instead of first flushing the database you can use the **--append** option:
 
 ```
