@@ -46,11 +46,16 @@ nettrine.fixtures:
 
 Type `bin/console` in your terminal and there should be a `doctrine:fixtures` command group.
 
-```
+```sh
 bin/console doctrine:fixtures:load
-bin/console doctrine:fixtures:load --append
 bin/console doctrine:fixtures:load --fixtures=db/fixtures/development
-bin/console doctrine:fixtures:load --purge-with-truncate
+```
+
+By default, the fixtures are appended to the database. If you want to delete all data before loading fixtures, use `--purge` option.
+
+```sh
+bin/console doctrine:fixtures:load --purge=truncate
+bin/console doctrine:fixtures:load --purge=delete
 ```
 
 ![Console Commands](https://raw.githubusercontent.com/nettrine/fixtures/master/.docs/assets/console.png)

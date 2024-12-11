@@ -116,7 +116,6 @@ Toolkit::test(function (): void {
 	try {
 		$commandTester = new CommandTester($loadDataFixtureCommand);
 		$commandTester->execute([
-			'--append' => true,
 			'--fixtures' => [Tests::FIXTURES_PATH],
 		]);
 	} catch (RuntimeException $e) {

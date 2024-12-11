@@ -39,27 +39,26 @@ final class LoadDataFixturesCommand extends Command
 	{
 		$this
 			->setDescription('Load data fixtures to your database')
-			->addOption('append', null, InputOption::VALUE_NONE, 'Append the data fixtures instead of deleting all data from the database first.')
 			->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'File or directory to load data fixtures from.')
-			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
-			->addOption('purge-with-truncate', null, InputOption::VALUE_NONE, 'Purge data by using a database-level TRUNCATE statement')
+			->addOption('em', null, InputOption::VALUE_NONE, 'The entity manager to use for this command.')
+			->addOption('purge', null, InputOption::VALUE_NONE, 'Purge data from database using TRUNCATE or DELETE. Default no purging, data will be appended.')
 			->setHelp(<<<'EOT'
 				The <info>%command.name%</info> command loads data fixtures from your application:
 
-				  <info>php %command.full_name%</info>
+					<info>php %command.full_name%</info>
 
 				You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
 
-				<info>%command.name% --fixtures=db/fixtures/development --fixtures=db/fixtures/staging</info>
+					<info>%command.name% --fixtures=db/fixtures/development --fixtures=db/fixtures/staging</info>
 
-				If you want to append the fixtures instead of flushing the database first you can use the <comment>--append</comment> option:
+				You provide entity manager name <info>--em</info> option:
 
-				  <info>php %command.full_name%</info> <comment>--append</comment>
+					<info>%command.name% --em=second/info>
 
-				By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from the database.
-				If you want to use a TRUNCATE statement instead you can use the <comment>--purge-with-truncate</comment> flag:
+				You can append, truncate or delete data using <comment>--append</comment> option (append by default):
 
-				  <info>php %command.full_name%</info> <comment>--purge-with-truncate</comment>
+					<info>php %command.full_name%</info> <comment>--purge=truncate</comment>
+					<info>php %command.full_name%</info> <comment>--purge=delete</comment>
 				EOT
 			);
 	}
@@ -68,16 +67,19 @@ final class LoadDataFixturesCommand extends Command
 	{
 		$ui = new SymfonyStyle($input, $output);
 
-		$inputAppend = ConsoleHelper::bool($input->getOption('append'));
 		$inputEm = ConsoleHelper::stringNull($input->getOption('em'));
-		$inputTruncate = ConsoleHelper::bool($input->getOption('purge-with-truncate'));
+		$inputPurge = ConsoleHelper::stringNull($input->getOption('purge'));
 		$inputFixtures = ConsoleHelper::arrayString($input->getOption('fixtures'));
+
+		if ($inputPurge !== null && !in_array($inputPurge, ['truncate', 'delete'], true)) {
+			throw new LogicalException(sprintf('Invalid value for --purge option. Use "truncate", "delete" or no value.'));
+		}
 
 		$em = $this->managerRegistry->getManager($inputEm);
 		assert($em instanceof EntityManagerInterface);
 
 		// Ask user to confirm purging database
-		if (!$inputAppend) {
+		if (in_array($inputPurge, ['truncate', 'delete'], true)) {
 			if (!$ui->confirm(sprintf('Careful, database "%s" will be purged. Do you want to continue?', $em->getConnection()->getDatabase()), !$input->isInteractive())) {
 				return 0;
 			}
@@ -102,7 +104,7 @@ final class LoadDataFixturesCommand extends Command
 		}
 
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($inputTruncate !== false ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($inputPurge === 'truncate' ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
 		$executor->setLogger(new class ($ui) extends AbstractLogger {
@@ -121,7 +123,7 @@ final class LoadDataFixturesCommand extends Command
 
 		});
 
-		$executor->execute($fixtures, $inputAppend);
+		$executor->execute($fixtures, $inputPurge === null);
 
 		return self::SUCCESS;
 	}

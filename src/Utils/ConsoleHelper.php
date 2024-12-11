@@ -12,7 +12,7 @@ class ConsoleHelper
 
 	public static function stringNull(mixed $value): ?string
 	{
-		if ($value === null || $value === '') {
+		if ($value === null || $value === '' || $value === false) {
 			return null;
 		}
 
