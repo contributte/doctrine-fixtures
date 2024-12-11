@@ -39,9 +39,9 @@ final class LoadDataFixturesCommand extends Command
 	{
 		$this
 			->setDescription('Load data fixtures to your database')
-			->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'File or directory to load data fixtures from.')
-			->addOption('em', null, InputOption::VALUE_NONE, 'The entity manager to use for this command.')
-			->addOption('purge', null, InputOption::VALUE_NONE, 'Purge data from database using TRUNCATE or DELETE. Default no purging, data will be appended.')
+			->addOption('fixtures', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'File or directory to load data fixtures from.')
+			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
+			->addOption('purge', null, InputOption::VALUE_REQUIRED, 'Purge data from database using TRUNCATE or DELETE. Default no purging, data will be appended.')
 			->setHelp(<<<'EOT'
 				The <info>%command.name%</info> command loads data fixtures from your application:
 
