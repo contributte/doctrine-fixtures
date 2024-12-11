@@ -18,7 +18,6 @@
   "require": {
     "php": ">=8.2",
     "nette/di": "^3.1.2",
-    "symfony/console": "^6.2.0",
     "doctrine/data-fixtures": "^1.6.6",
     "doctrine/orm": "^2.15.2"
   },
@@ -26,7 +25,8 @@
     "mockery/mockery": "^1.3.3",
     "contributte/qa": "^0.4",
     "contributte/tester": "^0.3",
-    "contributte/phpstan": "^0.1"
+    "contributte/phpstan": "^0.1",
+    "symfony/console": "^7.2.0"
   },
   "autoload": {
     "psr-4": {
