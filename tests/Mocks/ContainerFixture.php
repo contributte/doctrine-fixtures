@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\Fixtures;
+namespace Tests\Mocks;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Nette\DI\Container;
-use Nettrine\Fixtures\ContainerAwareInterface;
+use Nettrine\Fixtures\Fixture\ContainerAwareInterface;
 
 class ContainerFixture implements ContainerAwareInterface, FixtureInterface
 {

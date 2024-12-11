@@ -8,49 +8,48 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mockery;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
+use Nette\DI\Definitions\Statement;
 use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
 use Nettrine\Fixtures\DI\FixturesExtension;
 use Nettrine\Fixtures\Loader\FixturesLoader;
 use Tester\Assert;
-use Tests\Fixtures\ContainerFixture;
+use Tests\Mocks\ContainerFixture;
+use Tests\Toolkit\Tests;
 
-require_once __DIR__ . '/../../../bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 
 Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
-			// Manager registry is needed for console command
-			// It's also provided by nettrine/orm package
 			$compiler->getContainerBuilder()
-				->addImportedDefinition('managerRegistry')
-				->setType(ManagerRegistry::class);
+				->addDefinition('managerRegistry')
+				->setType(ManagerRegistry::class)
+				->setFactory(new Statement(Mockery::class . '::mock', [ManagerRegistry::class]));
 
 			$compiler->addExtension('fixtures', new FixturesExtension());
 			$compiler->addConfig([
 				'parameters' => [
-					'rootPath' => realpath(__DIR__ . '/../../../../'),
+					'fixturesPath' => Tests::FIXTURES_PATH,
 				],
 				'fixtures' => [
 					'paths' => [
-						'%rootPath%/tests/Fixtures',
+						'%fixturesPath%',
 					],
 				],
 			]);
 		})
 		->build();
 
-	$container->addService('managerRegistry', Mockery::mock(ManagerRegistry::class));
-
 	/** @var FixturesLoader $loader */
 	$loader = $container->getByType(FixturesLoader::class);
-	Assert::type(FixturesLoader::class, $loader);
 
 	// Load fixtures
+	Assert::count(0, $loader->getFixtures());
 	$loader->load();
+	Assert::count(1, $loader->getFixtures());
 
 	/** @var ContainerFixture $containerFixture */
 	$containerFixture = $loader->getFixture(ContainerFixture::class);
-	Assert::type(ContainerFixture::class, $containerFixture);
 	Assert::type(Container::class, $containerFixture->getContainer());
 
 	/** @var LoadDataFixturesCommand $command */
@@ -61,25 +60,23 @@ Toolkit::test(function (): void {
 Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
-			// Manager registry is needed for console command
-			// It's also provided by nettrine/orm package
 			$compiler->getContainerBuilder()
-				->addImportedDefinition('managerRegistry')
-				->setType(ManagerRegistry::class);
+				->addDefinition('managerRegistry')
+				->setType(ManagerRegistry::class)
+				->setFactory(new Statement(Mockery::class . '::mock', [ManagerRegistry::class]));
 
 			$compiler->addExtension('fixtures', new FixturesExtension());
 		})->build();
-
-	$container->addService('managerRegistry', Mockery::mock(ManagerRegistry::class));
 
 	/** @var FixturesLoader $loader */
 	$loader = $container->getByType(FixturesLoader::class);
 
 	// Load fixtures manually with given paths
-	$loader->loadPaths([__DIR__ . '/../../../Fixtures']);
+	Assert::count(0, $loader->getFixtures());
+	$loader->loadPaths([Tests::FIXTURES_PATH]);
+	Assert::count(1, $loader->getFixtures());
 
 	/** @var ContainerFixture $containerFixture */
 	$containerFixture = $loader->getFixture(ContainerFixture::class);
-	Assert::type(ContainerFixture::class, $containerFixture);
 	Assert::type(Container::class, $containerFixture->getContainer());
 });
