@@ -3,7 +3,6 @@
 namespace Nettrine\Fixtures\DI;
 
 use Nette\DI\CompilerExtension;
-use Nette\DI\Extensions\InjectExtension;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
@@ -33,7 +32,6 @@ class FixturesExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('loadDataFixturesCommand'))
 			->setFactory(LoadDataFixturesCommand::class)
-			->addTag(InjectExtension::TagInject, true)
 			->addTag('console.command', 'doctrine:fixtures:load');
 	}
 

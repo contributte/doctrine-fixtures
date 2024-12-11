@@ -46,22 +46,10 @@ nettrine.fixtures:
 
 Type `bin/console` in your terminal and there should be a `doctrine:fixtures` command group.
 
-The **doctrine:fixtures:load** command loads data fixtures from your configuration by default:
-
 ```
 bin/console doctrine:fixtures:load
-```
-
-If you want to append the fixtures instead of first flushing the database you can use the **--append** option:
-
-```
 bin/console doctrine:fixtures:load --append
-```
-
-By default `Doctrine Fixtures` uses `DELETE` statements to drop the existing rows from
-the database. If you want to use a `TRUNCATE` statement instead, you can use the **--purge-with-truncate** flag:
-
-```
+bin/console doctrine:fixtures:load --fixtures=db/fixtures/development
 bin/console doctrine:fixtures:load --purge-with-truncate
 ```
 
