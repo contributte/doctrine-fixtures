@@ -1,87 +1,46 @@
 # Contributte Doctrine Fixtures
 
-[Doctrine/DataFixtures](https://github.com/doctrine/data-fixtures) for Nette Framework
-
+Integration of [Doctrine DataFixtures](https://www.doctrine-project.org/projects/data-fixtures.html) for Nette Framework.
 
 ## Content
 
-- [Setup](#usage)
-- [Relying](#relying)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Examples](#examples)
 
+## Installation
 
-## Setup
-
-Install package
+Install package using composer.
 
 ```bash
 composer require nettrine/fixtures
 ```
 
-Register extension
+Register prepared [compiler extension](https://doc.nette.org/en/dependency-injection/nette-container) in your `config.neon` file.
 
-```yaml
+```neon
 extensions:
   nettrine.fixtures: Nettrine\Fixtures\DI\FixturesExtension
 ```
 
-
-## Relying
-
-Take advantage of enpowering this package with 2 extra packages:
-
-- `doctrine/orm`
-- `symfony/console`
-
-
-### `doctrine/orm`
-
-This package relies on `doctrine/orm`, use prepared [nettrine/orm](https://github.com/contributte/doctrine-orm) integration.
-Doctrine ORM depends on Doctrine DBAL, use prepared [nettrine/dbal](https://github.com/contributte/doctrine-dbal) integration
-
-```bash
-composer require nettrine/dbal
-composer require nettrine/orm
-```
-
-Without these packages the fixtures can't be processed, because they need a database connection and entities information.
-
-
-### `symfony/console`
-
-This package relies on `symfony/console`, use prepared [contributte/console](https://github.com/contributte/console) integration.
-
-```bash
-composer require contributte/console
-```
-
-```yaml
-extensions:
-  console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
-```
-
+> [!NOTE]
+> This is just **Fixtures**, for **ORM** use [nettrine/orm](https://github.com/contributte/doctrine-orm) or **DBAL** use [nettrine/dbal](https://github.com/contributte/doctrine-dbal).
 
 ## Configuration
 
-**Schema definition**
+### Minimal configuration
 
-```yaml
-nettrine.fixtures:
-  paths: <string[]>
-```
-
-**Under the hood**
-
-You should define paths where the fixture classes are stored.
-
-```yaml
+```neon
 nettrine.fixtures:
   paths:
     - %appDir%/fixtures
 ```
 
+### Advanced configuration
+
+Here is the list of all available options with their types.
+
+```yaml
+nettrine.fixtures:
+  paths: <string[]>
+```
 
 ## Usage
 
@@ -108,8 +67,7 @@ bin/console doctrine:fixtures:load --purge-with-truncate
 
 ![Console Commands](https://raw.githubusercontent.com/nettrine/fixtures/master/.docs/assets/console.png)
 
-
-### Fixture
+## Fixture
 
 The simplest fixture just implements **Doctrine\Common\DataFixtures\FixtureInterface**
 
@@ -154,6 +112,35 @@ class Foo2Fixture implements FixtureInterface, OrderedFixtureInterface
   public function getOrder(): int
   {
     return 1;
+  }
+
+}
+```
+
+If you need to run the fixtures in a fixed order after some other fixture, implement **Doctrine\Common\DataFixtures\DependentFixtureInterface**
+
+
+```php
+use Doctrine\Common\DataFixtures\FixtureInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+
+class Foo2Fixture implements FixtureInterface, DependentFixtureInterface
+{
+
+  /**
+   * Load data fixtures with the passed ObjectManager
+   */
+  public function load(ObjectManager $manager): void
+  {
+  }
+
+  /**
+   * Get the order of this fixture
+   */
+  public function getDependencies(): int
+  {
+    return [Foo1Fixture::class];
   }
 
 }
@@ -211,8 +198,38 @@ class Foo4Fixture implements FixtureInterface, ContainerAwareInterface
 }
 ```
 
+## DBAL & ORM
+
+> [!TIP]
+> Doctrine Migrations needs a database connection and entities information.
+> Take a look at [nettrine/dbal](https://github.com/contributte/doctrine-dbal) and [nettrine/orm](https://github.com/contributte/doctrine-orm).
+
+```bash
+composer require nettrine/dbal
+composer require nettrine/orm
+```
+
+### Console
+
+> [!TIP]
+> Doctrine DBAL needs Symfony Console to work. You can use `symfony/console` or [contributte/console](https://github.com/contributte/console).
+
+```bash
+composer require contributte/console
+```
+
+```neon
+extensions:
+  console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+
+  nettrine.dbal: Nettrine\DBAL\DI\DbalExtension
+```
+
+Since this moment when you type `bin/console`, there'll be registered commands from Doctrine DBAL.
+
+![Console Commands](https://raw.githubusercontent.com/nettrine/dbal/master/.docs/assets/console.png)
 
 ## Examples
 
-- https://github.com/contributte/playground (playground)
-- https://contributte.org/examples.html (more examples)
+> [!TIP]
+> Take a look at more examples in [contributte/doctrine](https://github.com/contributte/doctrine/tree/master/.docs).
