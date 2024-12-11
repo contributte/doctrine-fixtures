@@ -88,13 +88,14 @@ final class LoadDataFixturesCommand extends Command
 		// Load fixtures from given paths
 		if ($inputFixtures === []) {
 			$this->fixturesLoader->load();
+			$paths = $this->fixturesLoader->getPaths();
 		} else {
 			$this->fixturesLoader->loadPaths($inputFixtures);
+			$paths = $inputFixtures;
 		}
 
 		$fixtures = $this->fixturesLoader->getFixtures();
 		if ($fixtures === []) {
-			$paths = $this->fixturesLoader->getPaths();
 
 			if ($paths === []) {
 				throw new LogicalException('Could not find any fixtures to load.');
