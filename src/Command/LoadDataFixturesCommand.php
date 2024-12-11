@@ -7,6 +7,8 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Nettrine\Fixtures\Loader\FixturesLoader;
+use Psr\Log\AbstractLogger;
+use Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,22 +19,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Load data fixtures from bundles.
  *
- * @see https://github.com/doctrine/DoctrineFixturesBundle/blob/3.5.x/Command/LoadDataFixturesDoctrineCommand.php
+ * @see https://github.com/doctrine/DoctrineFixturesBundle
  */
 #[AsCommand(name: 'doctrine:fixtures:load')]
-class LoadDataFixturesCommand extends Command
+final class LoadDataFixturesCommand extends Command
 {
 
-	private FixturesLoader $fixturesLoader;
-
-	private ManagerRegistry $managerRegistry;
-
-	public function __construct(FixturesLoader $fixturesLoader, ManagerRegistry $managerRegistry)
+	public function __construct(
+		private FixturesLoader $fixturesLoader,
+		private ManagerRegistry $managerRegistry
+	)
 	{
 		parent::__construct();
-
-		$this->fixturesLoader = $fixturesLoader;
-		$this->managerRegistry = $managerRegistry;
 	}
 
 	protected function configure(): void
@@ -43,26 +41,21 @@ class LoadDataFixturesCommand extends Command
 			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
 			->addOption('purge-with-truncate', null, InputOption::VALUE_NONE, 'Purge data by using a database-level TRUNCATE statement')
 			->setHelp(<<<'EOT'
-The <info>%command.name%</info> command loads data fixtures from your application:
+				The <info>%command.name%</info> command loads data fixtures from your application:
 
-  <info>php %command.full_name%</info>
+				  <info>php %command.full_name%</info>
 
-Fixtures are services that are tagged with <comment>doctrine.fixture.orm</comment>.
+				Fixtures are services that are tagged with <comment>doctrine.fixture.orm</comment>.
 
-If you want to append the fixtures instead of flushing the database first you can use the <comment>--append</comment> option:
+				If you want to append the fixtures instead of flushing the database first you can use the <comment>--append</comment> option:
 
-  <info>php %command.full_name%</info> <comment>--append</comment>
+				  <info>php %command.full_name%</info> <comment>--append</comment>
 
-By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from the database.
-If you want to use a TRUNCATE statement instead you can use the <comment>--purge-with-truncate</comment> flag:
+				By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from the database.
+				If you want to use a TRUNCATE statement instead you can use the <comment>--purge-with-truncate</comment> flag:
 
-  <info>php %command.full_name%</info> <comment>--purge-with-truncate</comment>
-
-To execute only fixtures that live in a certain group, use:
-
-  <info>php %command.full_name%</info> <comment>--group=group1</comment>
-
-EOT
+				  <info>php %command.full_name%</info> <comment>--purge-with-truncate</comment>
+				EOT
 			);
 	}
 
@@ -70,10 +63,14 @@ EOT
 	{
 		$ui = new SymfonyStyle($input, $output);
 
-		$em = $this->managerRegistry->getManager(is_string($input->getOption('em')) ? $input->getOption('em') : null);
+		$inputAppend = filter_var($input->getOption('append'), FILTER_VALIDATE_BOOLEAN);
+		$inputEm = is_string($input->getOption('em')) && $input->getOption('em') !== '' ? $input->getOption('em') : null;
+		$inputTruncate = filter_var($input->getOption('purge-with-truncate'), FILTER_VALIDATE_BOOLEAN);
+
+		$em = $this->managerRegistry->getManager($inputEm);
 		assert($em instanceof EntityManagerInterface);
 
-		if ($input->getOption('append') === false) {
+		if (!$inputAppend) {
 			if (!$ui->confirm(sprintf('Careful, database "%s" will be purged. Do you want to continue?', $em->getConnection()->getDatabase()), !$input->isInteractive())) {
 				return 0;
 			}
@@ -87,17 +84,29 @@ EOT
 			return 1;
 		}
 
-		$purgeTruncate = $input->getOption('purge-with-truncate');
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($purgeTruncate !== false ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($inputTruncate !== false ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
-		$executor->setLogger(static function ($message) use ($ui): void {
-			$ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
-		});
-		$executor->execute($fixtures, $input->getOption('append') !== false);
+		$executor->setLogger(new class ($ui) extends AbstractLogger {
 
-		return 0;
+			public function __construct(private SymfonyStyle $ui)
+			{
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function log(mixed $level, string|Stringable $message, array $context = []): void
+			{
+				$this->ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
+			}
+
+		});
+
+		$executor->execute($fixtures, $inputAppend);
+
+		return self::SUCCESS;
 	}
 
 }
