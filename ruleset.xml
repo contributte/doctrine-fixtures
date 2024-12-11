@@ -14,7 +14,7 @@
 	</rule>
 
 	<rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix">
-		<exclude-pattern>src/ContainerAwareInterface.php</exclude-pattern>
+		<exclude-pattern>src/Fixture/ContainerAwareInterface.php</exclude-pattern>
 	</rule>
 
 	<!-- Excludes -->
