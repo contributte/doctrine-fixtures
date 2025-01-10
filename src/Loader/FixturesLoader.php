@@ -5,7 +5,7 @@ namespace Nettrine\Fixtures\Loader;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Loader;
 use Nette\DI\Container;
-use Nettrine\Fixtures\ContainerAwareInterface;
+use Nettrine\Fixtures\Fixture\ContainerAwareInterface;
 
 class FixturesLoader extends Loader
 {

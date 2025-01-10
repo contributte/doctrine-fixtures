@@ -6,7 +6,11 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Nettrine\Fixtures\Exceptions\LogicalException;
 use Nettrine\Fixtures\Loader\FixturesLoader;
+use Nettrine\Fixtures\Utils\ConsoleHelper;
+use Psr\Log\AbstractLogger;
+use Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,52 +21,45 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Load data fixtures from bundles.
  *
- * @see https://github.com/doctrine/DoctrineFixturesBundle/blob/3.5.x/Command/LoadDataFixturesDoctrineCommand.php
+ * @see https://github.com/doctrine/DoctrineFixturesBundle
  */
 #[AsCommand(name: 'doctrine:fixtures:load')]
-class LoadDataFixturesCommand extends Command
+final class LoadDataFixturesCommand extends Command
 {
 
-	private FixturesLoader $fixturesLoader;
-
-	private ManagerRegistry $managerRegistry;
-
-	public function __construct(FixturesLoader $fixturesLoader, ManagerRegistry $managerRegistry)
+	public function __construct(
+		private FixturesLoader $fixturesLoader,
+		private ManagerRegistry $managerRegistry
+	)
 	{
 		parent::__construct();
-
-		$this->fixturesLoader = $fixturesLoader;
-		$this->managerRegistry = $managerRegistry;
 	}
 
 	protected function configure(): void
 	{
 		$this
 			->setDescription('Load data fixtures to your database')
-			->addOption('append', null, InputOption::VALUE_NONE, 'Append the data fixtures instead of deleting all data from the database first.')
+			->addOption('fixtures', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'File or directory to load data fixtures from.')
 			->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
-			->addOption('purge-with-truncate', null, InputOption::VALUE_NONE, 'Purge data by using a database-level TRUNCATE statement')
+			->addOption('purge', null, InputOption::VALUE_REQUIRED, 'Purge data from database using TRUNCATE or DELETE. Default no purging, data will be appended.')
 			->setHelp(<<<'EOT'
-The <info>%command.name%</info> command loads data fixtures from your application:
+				The <info>%command.name%</info> command loads data fixtures from your application:
 
-  <info>php %command.full_name%</info>
+					<info>php %command.full_name%</info>
 
-Fixtures are services that are tagged with <comment>doctrine.fixture.orm</comment>.
+				You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
 
-If you want to append the fixtures instead of flushing the database first you can use the <comment>--append</comment> option:
+					<info>%command.name% --fixtures=db/fixtures/development --fixtures=db/fixtures/staging</info>
 
-  <info>php %command.full_name%</info> <comment>--append</comment>
+				You provide entity manager name <info>--em</info> option:
 
-By default Doctrine Data Fixtures uses DELETE statements to drop the existing rows from the database.
-If you want to use a TRUNCATE statement instead you can use the <comment>--purge-with-truncate</comment> flag:
+					<info>%command.name% --em=second/info>
 
-  <info>php %command.full_name%</info> <comment>--purge-with-truncate</comment>
+				You can append, truncate or delete data using <comment>--append</comment> option (append by default):
 
-To execute only fixtures that live in a certain group, use:
-
-  <info>php %command.full_name%</info> <comment>--group=group1</comment>
-
-EOT
+					<info>php %command.full_name%</info> <comment>--purge=truncate</comment>
+					<info>php %command.full_name%</info> <comment>--purge=delete</comment>
+				EOT
 			);
 	}
 
@@ -70,35 +67,66 @@ EOT
 	{
 		$ui = new SymfonyStyle($input, $output);
 
-		$em = $this->managerRegistry->getManager(is_string($input->getOption('em')) ? $input->getOption('em') : null);
+		$inputEm = ConsoleHelper::stringNull($input->getOption('em'));
+		$inputPurge = ConsoleHelper::stringNull($input->getOption('purge'));
+		$inputFixtures = ConsoleHelper::arrayString($input->getOption('fixtures'));
+
+		if ($inputPurge !== null && !in_array($inputPurge, ['truncate', 'delete'], true)) {
+			throw new LogicalException(sprintf('Invalid value for --purge option. Use "truncate", "delete" or no value.'));
+		}
+
+		$em = $this->managerRegistry->getManager($inputEm);
 		assert($em instanceof EntityManagerInterface);
 
-		if ($input->getOption('append') === false) {
+		// Ask user to confirm purging database
+		if (in_array($inputPurge, ['truncate', 'delete'], true)) {
 			if (!$ui->confirm(sprintf('Careful, database "%s" will be purged. Do you want to continue?', $em->getConnection()->getDatabase()), !$input->isInteractive())) {
 				return 0;
 			}
 		}
 
-		$this->fixturesLoader->load();
+		// Load fixtures from given paths
+		if ($inputFixtures === []) {
+			$this->fixturesLoader->load();
+			$paths = $this->fixturesLoader->getPaths();
+		} else {
+			$this->fixturesLoader->loadPaths($inputFixtures);
+			$paths = $inputFixtures;
+		}
+
 		$fixtures = $this->fixturesLoader->getFixtures();
 
 		if ($fixtures === []) {
-			$ui->error('Could not find any fixture services to load.');
-
-			return 1;
+			if ($paths === []) {
+				throw new LogicalException('Could not find any fixtures to load.');
+			} else {
+				throw new LogicalException(sprintf('Could not find any fixtures to load in paths: %s', implode(', ', $paths)));
+			}
 		}
 
-		$purgeTruncate = $input->getOption('purge-with-truncate');
 		$purger = new ORMPurger($em);
-		$purger->setPurgeMode($purgeTruncate !== false ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
+		$purger->setPurgeMode($inputPurge === 'truncate' ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 
 		$executor = new ORMExecutor($em, $purger);
-		$executor->setLogger(static function ($message) use ($ui): void {
-			$ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
-		});
-		$executor->execute($fixtures, $input->getOption('append') !== false);
+		$executor->setLogger(new class ($ui) extends AbstractLogger {
 
-		return 0;
+			public function __construct(private SymfonyStyle $ui)
+			{
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			public function log(mixed $level, string|Stringable $message, array $context = []): void
+			{
+				$this->ui->text(sprintf('  <comment>></comment> <info>%s</info>', $message));
+			}
+
+		});
+
+		$executor->execute($fixtures, $inputPurge === null);
+
+		return self::SUCCESS;
 	}
 
 }
