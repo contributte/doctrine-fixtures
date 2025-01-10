@@ -2,7 +2,9 @@
 
 namespace Nettrine\Fixtures\DI;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nettrine\Fixtures\Command\LoadDataFixturesCommand;
@@ -33,6 +35,20 @@ class FixturesExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('loadDataFixturesCommand'))
 			->setFactory(LoadDataFixturesCommand::class)
 			->addTag('console.command', 'doctrine:fixtures:load');
+	}
+
+	public function beforeCompile(): void
+	{
+		$builder = $this->getContainerBuilder();
+
+		$fixtures = $builder->findByType(FixtureInterface::class);
+
+		/** @var ServiceDefinition $fixtureLoader */
+		$fixtureLoader = $builder->getDefinitionByType(FixturesLoader::class);
+
+		foreach ($fixtures as $fixture) {
+			$fixtureLoader->addSetup('addFixture', [$fixture]);
+		}
 	}
 
 }
