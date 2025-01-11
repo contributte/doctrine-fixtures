@@ -4,6 +4,7 @@ namespace Tests\Cases\Unit\DI;
 
 use Contributte\Tester\Toolkit;
 use Contributte\Tester\Utils\ContainerBuilder;
+use Contributte\Tester\Utils\Neonkit;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mockery;
@@ -122,4 +123,26 @@ Toolkit::test(function (): void {
 		Assert::equal(999, $e->getCode());
 		Assert::count(1, $loader->getFixtures());
 	}
+});
+
+// Load fixtures from container
+Toolkit::test(function (): void {
+	$container = ContainerBuilder::of()
+		->withCompiler(function (Compiler $compiler): void {
+			$compiler->getContainerBuilder()
+				->addDefinition('managerRegistry')
+				->setType(ManagerRegistry::class)
+				->setFactory(new Statement(Mockery::class . '::mock', [ManagerRegistry::class]));
+
+			$compiler->addExtension('fixtures', new FixturesExtension());
+			$compiler->addConfig(Neonkit::load('
+				services:
+					- Tests\Mocks\ContainerFixture
+			'));
+		})->build();
+
+	/** @var FixturesLoader $loader */
+	$loader = $container->getByType(FixturesLoader::class);
+
+	Assert::count(1, $loader->getFixtures());
 });
