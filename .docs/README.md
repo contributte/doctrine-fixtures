@@ -4,6 +4,15 @@ Integration of [Doctrine DataFixtures](https://www.doctrine-project.org/projects
 
 ## Content
 
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [Minimal configuration](#minimal-configuration)
+  - [Advanced configuration](#advanced-configuration)
+- [Usage](#usage)
+  - [Console](#console)
+  - [Fixtures](#fixtures)
+  - [Services](#services)
+- [Examples](#examples)
 
 ## Installation
 
@@ -44,6 +53,8 @@ nettrine.fixtures:
 
 ## Usage
 
+### Console
+
 Type `bin/console` in your terminal and there should be a `doctrine:fixtures` command group.
 
 ```sh
@@ -60,7 +71,7 @@ bin/console doctrine:fixtures:load --purge=delete
 
 ![Console Commands](https://raw.githubusercontent.com/nettrine/fixtures/master/.docs/assets/console.png)
 
-## Fixture
+### Fixtures
 
 The simplest fixture just implements **Doctrine\Common\DataFixtures\FixtureInterface**
 
@@ -202,37 +213,6 @@ services:
   - App\Fixtures\Foo3Fixture
   - App\Fixtures\Foo4Fixture
 ```
-
-## DBAL & ORM
-
-> [!TIP]
-> Doctrine Migrations needs a database connection and entities information.
-> Take a look at [nettrine/dbal](https://github.com/contributte/doctrine-dbal) and [nettrine/orm](https://github.com/contributte/doctrine-orm).
-
-```bash
-composer require nettrine/dbal
-composer require nettrine/orm
-```
-
-### Console
-
-> [!TIP]
-> Doctrine DBAL needs Symfony Console to work. You can use `symfony/console` or [contributte/console](https://github.com/contributte/console).
-
-```bash
-composer require contributte/console
-```
-
-```neon
-extensions:
-  console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
-
-  nettrine.dbal: Nettrine\DBAL\DI\DbalExtension
-```
-
-Since this moment when you type `bin/console`, there'll be registered commands from Doctrine DBAL.
-
-![Console Commands](https://raw.githubusercontent.com/nettrine/dbal/master/.docs/assets/console.png)
 
 ## Examples
 
