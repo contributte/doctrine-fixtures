@@ -10,7 +10,7 @@ Integration of [Doctrine DataFixtures](https://www.doctrine-project.org/projects
 Install package using composer.
 
 ```bash
-composer require nettrine/fixtures
+composer require nettrine/annotations
 ```
 
 Register prepared [compiler extension](https://doc.nette.org/en/dependency-injection/nette-container) in your `config.neon` file.
@@ -189,6 +189,18 @@ class Foo4Fixture implements FixtureInterface, ContainerAwareInterface
   }
 
 }
+```
+
+### Services
+
+To autoload your fixtures, register them as services in your `config.neon` file.
+
+```neon
+services:
+  - App\Fixtures\Foo1Fixture
+  - App\Fixtures\Foo2Fixture
+  - App\Fixtures\Foo3Fixture
+  - App\Fixtures\Foo4Fixture
 ```
 
 ## DBAL & ORM
